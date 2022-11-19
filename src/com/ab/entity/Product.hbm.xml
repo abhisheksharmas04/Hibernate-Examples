@@ -1,0 +1,17 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name = "com.ab.entity.Product" table = "PRODUCT">
+
+        <id name = "pid" column = "PID"/> <!-- Singular id field configuration -->
+
+        <property name = "pname" column = "PNAME"/>
+        <property name = "price" column = "PRICE"/>
+        <property name = "qty" column = "QTY"/>
+        <property name = "status" column = "STATUS"/>
+
+    </class>
+</hibernate-mapping>
