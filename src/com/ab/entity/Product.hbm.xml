@@ -6,7 +6,9 @@
 <hibernate-mapping>
     <class name = "com.ab.entity.Product" table = "PRODUCT">
 
-        <id name = "pid" column = "PID"/> <!-- Singular id field configuration -->
+        <id name = "pid" column = "PID"> <!-- Singular id field configuration -->
+            <generator class="increment"></generator>
+        </id>
 
         <property name = "pname" column = "PNAME"/>
         <property name = "price" column = "PRICE"/>

@@ -4,8 +4,6 @@ import com.ab.entity.Product;
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
 
-Start from Day-21
-
 public class TestHibernate {
     public static void main(String[] args) {
         Configuration configuration = new Configuration();
@@ -58,7 +56,7 @@ public class TestHibernate {
 
         // preapare Entity class object having data
         Product product = new Product();
-        product.setPid(1);
+        product.setPid(1002);
         product.setPname("TV");
         product.setPrice(9000.98);
         product.setQty(10.0);
@@ -69,7 +67,56 @@ public class TestHibernate {
 
         try {
             transaction = session.beginTransaction();
-            session.save(product);
+            /*begin transaction by disableing autocommit mode underlying on DB S/w
+                By default it uses JDBC for Transaction Management.
+
+                Internally calls con.setAutoCommit(false) to simple begin the transaction.
+
+                Hibernate can use either JDBC or JTA for transaction Management. By default it uses JDBC
+                to change to JTA we need to add extra instruction in hibernate.cfg.xml file.
+
+                NOTE:: Transaction object in hibernate is nothing but the object of underlying hibernate
+                framework supplied java class that implements org.hibernate.Transaction(I)
+
+                In Plain JDBC: To being the transaction we call con.setAutoCommit(false)
+                To commit the transaction we call con.commit();
+                To rollback transaction we call con.rollBack();
+
+                In JTA Tx Management:
+                    InitalContext ic = new InitialContext();
+                    UserTransaction ut = (UserTransaction).lookup("---");
+                    To begain Tx --> ut.begin()
+                    To commit Tx --> ut.commit()
+                    To rollback Tx --> ut.rollBack()
+
+                In Hibernate Tx Management:
+                    To begain transcation : Transaction tx = Session.beginTransaction()
+                    To commit Tx: tx.commit()
+                    To rollback Tx: tx.rollback()
+            */
+            //session.save(product);
+            int idVal = (int) session.save(product);
+            System.out.println("Generated Id value: " + idVal);
+            /*
+                session.save(product) to only save the object but also return the ID value
+                session.save(product) perform the following :
+                    (1) Takes the entity object and identifies the id field from mapping file.
+                    (2) Gives save object persistance instructions to hibernate framework.
+                    (3) keeps the received objects of entity class in the first level cache i.e. l1 cache.
+                    (4) Gathers/ Generate id value from id property and returns back to client application as Serializable object
+
+                    NOTE:: Wrapper class objects are serializable object by default.
+                Signature of session.save() method:
+                    public Serializable save(Object obj)
+
+                  session.save() method does not sends and execute query in db s/w, it just give save object persistance instruction to Hibernate f/w
+                  the actual persistance take place when Tx.commit() method is called
+
+                  if the id generator is cfg using <generator> then the session.save() method returns the
+                  generated id value back to client app otherwise it returns the value assigned to id property
+                  as the id value back to app.
+
+            */
             flag = true;
         }catch (HibernateException hbe){
             hbe.printStackTrace();;
@@ -80,13 +127,43 @@ public class TestHibernate {
         }finally {
             if(flag){
                 transaction.commit();
+                /*
+                    Tx.commit():
+                        (1) collects objects of entity classes that are there in L1 cache or first level cache
+                            on which pending persistence operation are there.
+                        (2) takes the  persistence instruction to hibernate framework like save object instruction by
+                            calling session.save() method.
+                        (3) Generates/uses SQL queries to complete persistence instructions like insert sql for session.save()
+                            sends and execute that query in DB s/w to complete persistence operations like inserting records
+                        (4) Call conn.commit() or ut.commit() internally
+
+
+                */
                 System.out.println("Object Saved");
             }else {
                 transaction.rollback();
+                /*
+                    Tx.rollback():
+                        (1) Tx.rollback() method do undo changes happened in db s/w
+                */
                 System.out.println("Object not saved");
             }
             session.close();
+            /*
+                session.close() close the session with DB s/w from hibernate app
+                Internally call con.close() method to realsed the JDCB con object back to connection pool
+                Vanishes L1/First level cache by destroying object in it.
+                return the realised connection object to client applicaiton.
+            */
             sessionFactory.close();
+            /*
+                sessionFactory.close();
+                    (1) Destroys the sessionFactory i.e. deactivates the hibernate framework by realising
+                    multiple service resources that are associated with sessionFactory objects:
+                    they are JDCB connection pool, L2 Cache, SecondLevel cache, Dialect service.
+
+                    NOTE:: first close all active session objects before closing all session factory object.
+            */
         }
 
     }
