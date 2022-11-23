@@ -4,13 +4,36 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-    <class name = "com.ab.entity.Product" table = "PRODUCT">
+    <class name = "com.ab.entity.Product" table = "PRODUCT" dynamic-insert="true" dynamic-update="true">
+<!--
+    what do you mean by dynamic insert or dynamic sql query generation in hibernate?
+    For all the entity class collectied from the mapping files the SessionFactory object generates basic insert,update,delete and select sql queries
+    having id field value as the criteria value. These sql queries are called pre-generated sql queries. When session.save(),session.update()
+    session.delete() and session.get() methods are called these pre-generated queries will be used internally to complete persistance operations
 
-        <id name = "pid" column = "PID"> <!-- Singular id field configuration -->
-            <generator class="increment"></generator>
-        </id>
+    -> Generally pre-generated sql queries involves all the coloum values in the sql query generation even though the relevent property of entity class
+    object are having null values i.e. though  we do not data to certain property of entity class object, still their realvent cols will participate in
+    pre-generation of sql queries given by Dialect.
 
-        <property name = "pname" column = "PNAME"/>
+    -> To overcome this problem we need for dynamic sql query generation process. Using dynamic-insert = true or dynamic-update=true attributes of
+    <class> tags in mapping file.
+
+    -> To take the benfit of dynamic sql queries generation take the support of Wrapper data type properties in the entity class which holds the
+    null value when no data is assigned,, not the 0 values.
+
+    Q-> Why are there are no "dynamic delete and dynamic select" attributes in <class> tag of generated delete, select sql queries dynamically?
+    ANS-> Delete sql query delete complete record.. not specifed col value.. So only id filled/property values is required from entity object to
+    generate delete sql query. so dynamic delete is not requried.
+    The session.get(-) and session.load(-) first generate sql query selecting entire record based on the given id value and they created object for
+    entity class to store the retrieved record into that object. So there is no possiblity of dynamic select sql query involving sepecific cols of
+    ur choice. for such acitivities go for hql/jpql queries.
+ -->
+
+        <id name = "pid" column = "PID"/> <!-- Singular id field configuration -->
+            <!--<generator class="increment"></generator>-->
+        <!--</id>-->
+
+        <property name = "pname" column = "PNAME"  />
         <property name = "price" column = "PRICE"/>
         <property name = "qty" column = "QTY"/>
         <property name = "status" column = "STATUS"/>
