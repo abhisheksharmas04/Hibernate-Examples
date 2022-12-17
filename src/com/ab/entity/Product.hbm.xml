@@ -4,7 +4,7 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-    <class name = "com.ab.entity.Product" table = "PRODUCT" dynamic-insert="true" dynamic-update="true">
+    <class name = "com.ab.entity.Product" table = "PRODUCT" dynamic-insert="true" dynamic-update="true" lazy="false">
 <!--
     what do you mean by dynamic insert or dynamic sql query generation in hibernate?
     For all the entity class collectied from the mapping files the SessionFactory object generates basic insert,update,delete and select sql queries

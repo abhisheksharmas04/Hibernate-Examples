@@ -9,6 +9,11 @@ public class Product {
     private String status;
 
     public Product() {
+        System.out.println("Product.Product 0 :: param connstructor");
+        System.out.println("class Name: " + this.getClass());
+        System.out.println("Hash code: " + this.hashCode());
+        System.out.println("Super class: " + this.getClass().getSuperclass());
+        System.out.println("Identity Haso code: " + System.identityHashCode(this));
     }
 
     public Product(Integer pid, String pname, Double price, Double qty, String status) {
